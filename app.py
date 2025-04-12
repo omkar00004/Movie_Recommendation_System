@@ -1,14 +1,27 @@
 import streamlit as st
 import pickle
 import pandas as pd
+import numpy as np
 
 # Load movies data
 movies = pickle.load(open('movies.pkl', 'rb'))  # rb means read binary
 movies['title'] = movies['title'].apply(lambda x: x.title())  # make it into title case
 movies_list = movies['title'].values
 
-# Load similarity matrix
-similarity = pickle.load(open('similarity.pkl', 'rb'))
+# Load similarity matrix parts and reconstruct
+@st.cache_resource  # Cache this to avoid reloading every time
+def load_similarity():
+    part1 = pickle.load(open('similarity_part1.pkl', 'rb'))
+    part2 = pickle.load(open('similarity_part2.pkl', 'rb'))
+    part3 = pickle.load(open('similarity_part3.pkl', 'rb'))
+    part4 = pickle.load(open('similarity_part4.pkl', 'rb'))
+    
+    # Reconstruct the matrix
+    top_half = np.hstack((part1, part2))
+    bottom_half = np.hstack((part3, part4))
+    return np.vstack((top_half, bottom_half))
+
+similarity = load_similarity()
 
 # Load posters data from CSV
 posters_df = pd.read_csv('movies_tmdb_posters.csv')
