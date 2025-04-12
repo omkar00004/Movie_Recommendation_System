@@ -2,6 +2,7 @@ import streamlit as st
 import pickle
 import pandas as pd
 import numpy as np
+import os
 
 # Load movies data
 movies = pickle.load(open('movies.pkl', 'rb'))  # rb means read binary
@@ -11,6 +12,46 @@ movies_list = movies['title'].values
 # Load similarity matrix parts and reconstruct
 @st.cache_resource  # Cache this to avoid reloading every time
 def load_similarity():
+    # Check if the original similarity file exists
+    if os.path.exists('similarity.pkl'):
+        st.info("Loading original similarity matrix...")
+        return pickle.load(open('similarity.pkl', 'rb'))
+    
+    # Check if split files exist
+    split_files_exist = all(os.path.exists(f'similarity_part{i}.pkl') for i in range(1, 5))
+    
+    if not split_files_exist:
+        st.error("Similarity matrix files not found. Please make sure they exist in the correct location.")
+        st.info("If you have the original similarity.pkl file, you need to split it first.")
+        
+        # Provide a way to split the file if it exists
+        if os.path.exists('similarity.pkl') and st.button("Split similarity matrix"):
+            with st.spinner("Splitting similarity matrix..."):
+                # Load the original matrix
+                similarity = pickle.load(open('similarity.pkl', 'rb'))
+                
+                # Get the shape
+                shape = similarity.shape
+                half_row = shape[0] // 2
+                half_col = shape[1] // 2
+                
+                # Split the matrix
+                part1 = similarity[:half_row, :half_col]
+                part2 = similarity[:half_row, half_col:]
+                part3 = similarity[half_row:, :half_col]
+                part4 = similarity[half_row:, half_col:]
+                
+                # Save each part
+                pickle.dump(part1, open('similarity_part1.pkl', 'wb'))
+                pickle.dump(part2, open('similarity_part2.pkl', 'wb'))
+                pickle.dump(part3, open('similarity_part3.pkl', 'wb'))
+                pickle.dump(part4, open('similarity_part4.pkl', 'wb'))
+                
+                st.success("Split complete! Refresh the page to load the split files.")
+                
+        return np.zeros((1, 1))  # Return empty matrix as placeholder
+    
+    # Load the split files
     part1 = pickle.load(open('similarity_part1.pkl', 'rb'))
     part2 = pickle.load(open('similarity_part2.pkl', 'rb'))
     part3 = pickle.load(open('similarity_part3.pkl', 'rb'))
@@ -21,7 +62,13 @@ def load_similarity():
     bottom_half = np.hstack((part3, part4))
     return np.vstack((top_half, bottom_half))
 
-similarity = load_similarity()
+# Try to load similarity matrix
+try:
+    similarity = load_similarity()
+    similarity_loaded = True
+except Exception as e:
+    st.error(f"Error loading similarity matrix: {e}")
+    similarity_loaded = False
 
 # Load posters data from CSV
 posters_df = pd.read_csv('movies_tmdb_posters.csv')
