@@ -1,0 +1,14 @@
+pd.values
+pd.value_count
+pd.info()
+pd.isnull().sum() - if any null values, if yes then sum all null values
+pd.dropna - Remove all rows with NULL values from the DataFrame.
+pd.duplicated().sum() - if any duplicated values, if yes then sum all duplicated values
+pd.apply() - apply to all
+In pandas : lamda - accepts a function as an argument and applies that function to all the elements in the Series.
+The fit(data) method is used to compute the mean and std dev for a given feature to be used further for scaling.
+The transform(data) method is used to perform scaling using mean and std dev calculated using the .fit() method.
+The fit_transform() method does both fits and transform.
+Sparse matrix -  matrix which has most of the elements zero is called sparse matrix
+euclidean distance is not good - as the Dimensions increases the value is not properly outputed,  therefore we use cosine_similarity
+for cosine_similarity distance is inversely proportional to similarity

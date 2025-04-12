@@ -1,0 +1,8 @@
+pd.values
+pd.value_count
+pd.info()
+pd.isnull().sum() - if any null values, if yes then sum all null values
+pd.dropna - Remove all rows with NULL values from the DataFrame.
+pd.duplicated().sum() - if any duplicated values, if yes then sum all duplicated values
+pd.apply() - apply to all
+In pandas : lamda - accepts a function as an argument and applies that function to all the elements in the Series.
