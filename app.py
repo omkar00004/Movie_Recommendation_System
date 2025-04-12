@@ -14,7 +14,6 @@ movies_list = movies['title'].values
 def load_similarity():
     # Check if the original similarity file exists
     if os.path.exists('similarity.pkl'):
-        st.info("Loading original similarity matrix...")
         return pickle.load(open('similarity.pkl', 'rb'))
     
     # Check if split files exist
